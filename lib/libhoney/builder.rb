@@ -98,8 +98,8 @@ module Libhoney
     #   ev = builder.event
     #   ev.add_field("additionalField", value)
     #   ev.send
-    def event
-      Event.new(@libhoney, self, @fields, @dyn_fields)
+    def event(is_marker = false)
+      Event.new(@libhoney, self, @fields, @dyn_fields, is_marker)
     end
 
     # creates and returns a clone of this builder, merged with fields and dyn_fields passed as arguments.

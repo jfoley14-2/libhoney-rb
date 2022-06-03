@@ -44,7 +44,7 @@ module Libhoney
     # @api private
     # @see Client#event
     # @see Builder#event
-    def initialize(libhoney, builder, fields = {}, dyn_fields = {})
+    def initialize(libhoney, builder, fields = {}, dyn_fields = {}, is_marker = false)
       @libhoney    = libhoney
       @writekey    = builder.writekey
       @dataset     = builder.dataset
@@ -52,6 +52,7 @@ module Libhoney
       @api_host    = builder.api_host
       @timestamp   = Time.now
       @metadata    = nil
+      @is_marker = is_marker
 
       @data = {}
       fields.each { |k, v| add_field(k, v) }
@@ -108,10 +109,12 @@ module Libhoney
     #
     # @return [self] this event.
     def send
-      # discard if sampling rate says so
-      if @libhoney.should_drop(sample_rate)
-        @libhoney.send_dropped_response(self, 'event dropped due to sampling')
-        return
+      unless @is_marker
+        # discard if sampling rate says so
+        if @libhoney.should_drop(sample_rate)
+          @libhoney.send_dropped_response(self, 'event dropped due to sampling')
+          return
+        end
       end
 
       send_presampled
@@ -121,7 +124,7 @@ module Libhoney
     #
     # @return [self] this event.
     def send_presampled
-      @libhoney.send_event(self)
+      @is_marker ? @libhoney.send_marker(self) : @libhoney.send_event(self)
       self
     end
   end
