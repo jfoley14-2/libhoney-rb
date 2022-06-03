@@ -38,6 +38,10 @@ module Libhoney
     #   creation)
     attr_accessor :timestamp
 
+    # @return [Boolean] Set this attribute to true in order to label the event
+    #   as a marker.
+    attr_accessor :is_marker
+
     # @return [Hash<String=>any>] the fields added to this event
     attr_reader :data
 
@@ -52,6 +56,7 @@ module Libhoney
       @api_host    = builder.api_host
       @timestamp   = Time.now
       @metadata    = nil
+      @is_marker = false
 
       @data = {}
       fields.each { |k, v| add_field(k, v) }
@@ -108,10 +113,12 @@ module Libhoney
     #
     # @return [self] this event.
     def send
-      # discard if sampling rate says so
-      if @libhoney.should_drop(sample_rate)
-        @libhoney.send_dropped_response(self, 'event dropped due to sampling')
-        return
+      unless is_marker
+        # discard if sampling rate says so
+        if @libhoney.should_drop(sample_rate)
+          @libhoney.send_dropped_response(self, 'event dropped due to sampling')
+          return
+        end
       end
 
       send_presampled
@@ -121,7 +128,7 @@ module Libhoney
     #
     # @return [self] this event.
     def send_presampled
-      @libhoney.send_event(self)
+      is_marker ? @libhoney.send_marker(self) : @libhoney.send_event(self)
       self
     end
   end

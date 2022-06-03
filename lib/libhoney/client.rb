@@ -152,6 +152,26 @@ module Libhoney
       self
     end
 
+    # send a Marker creation request to Honeycomb.
+    #
+    # @param message [String] the message associated with the marker.
+    # @param type [String] the type associated with the marker
+    # @return [self] this libhoney instance.
+    # @example
+    #   honey.create_marker("test message", "test type")
+    def create_marker(message, type)
+      ev = @builder.event
+      ev.is_marker = true
+
+      ev.add({
+        :message => message,
+        :type => type
+      })
+
+      ev.send
+      self
+    end
+
     # @deprecated
     # Creates and sends an event, including all global builder fields/dyn_fields, as well as anything in the optional data parameter.
     #
@@ -196,6 +216,15 @@ module Libhoney
       rescue ThreadError
         # happens if the queue was full and block_on_responses = false.
       end
+    end
+
+    ##
+    # Send a marker to Honeycomb.
+    #
+    # @param marker [Event] the marker to send to honeycomb
+    # @api private
+    def send_marker(marker)
+      @transmission.fire_marker(marker)
     end
 
     # @api private

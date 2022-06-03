@@ -185,6 +185,16 @@ module Libhoney
       flush_batched_events(batched_events)
     end
 
+    def fire_marker(marker)
+      send_with_retry(
+        build_http_clients[marker.api_host],
+        marker.dataset,
+        JSON.generate(clean_data(marker.data)),
+        { 'X-Honeycomb-Team' => marker.writekey },
+        'markers'
+      )
+    end
+
     private
 
     def setup_batch_queue
@@ -334,12 +344,12 @@ module Libhoney
       end
     end
 
-    def send_with_retry(client, dataset, body, headers)
+    def send_with_retry(client, dataset, body, headers, endpoint = 'batch')
       attempts = 0
       begin
         attempts += 1
         client.post(
-          path: "/1/batch/#{Addressable::URI.escape(dataset)}",
+          path: "/1/#{endpoint}/#{Addressable::URI.escape(dataset)}",
           body: body,
           headers: headers
         )
