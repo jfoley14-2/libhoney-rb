@@ -113,7 +113,7 @@ module Libhoney
     #
     # @return [self] this event.
     def send
-      unless @is_marker
+      unless is_marker
         # discard if sampling rate says so
         if @libhoney.should_drop(sample_rate)
           @libhoney.send_dropped_response(self, 'event dropped due to sampling')
@@ -128,7 +128,7 @@ module Libhoney
     #
     # @return [self] this event.
     def send_presampled
-      @is_marker ? @libhoney.send_marker(self) : @libhoney.send_event(self)
+      is_marker ? @libhoney.send_marker(self) : @libhoney.send_event(self)
       self
     end
   end
