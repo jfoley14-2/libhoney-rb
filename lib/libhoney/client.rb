@@ -158,7 +158,7 @@ module Libhoney
     # @param type [String] the type associated with the marker
     # @return [self] this libhoney instance.
     # @example
-    #   honey.create_marker("MyCodeExerciseDataset", "test message", "test type")
+    #   honey.create_marker("test message", "test type")
     def create_marker(message, type)
       ev = @builder.event(true)
 
