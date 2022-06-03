@@ -160,7 +160,8 @@ module Libhoney
     # @example
     #   honey.create_marker("test message", "test type")
     def create_marker(message, type)
-      ev = @builder.event(true)
+      ev = @builder.event
+      ev.is_marker = true
 
       ev.add({
         :message => message,

@@ -38,13 +38,17 @@ module Libhoney
     #   creation)
     attr_accessor :timestamp
 
+    # @return [Boolean] Set this attribute to true in order to label the event
+    #   as a marker.
+    attr_accessor :is_marker
+
     # @return [Hash<String=>any>] the fields added to this event
     attr_reader :data
 
     # @api private
     # @see Client#event
     # @see Builder#event
-    def initialize(libhoney, builder, fields = {}, dyn_fields = {}, is_marker = false)
+    def initialize(libhoney, builder, fields = {}, dyn_fields = {})
       @libhoney    = libhoney
       @writekey    = builder.writekey
       @dataset     = builder.dataset
@@ -52,7 +56,7 @@ module Libhoney
       @api_host    = builder.api_host
       @timestamp   = Time.now
       @metadata    = nil
-      @is_marker = is_marker
+      @is_marker = false
 
       @data = {}
       fields.each { |k, v| add_field(k, v) }
