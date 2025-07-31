@@ -260,7 +260,7 @@ module Libhoney
     end
 
     def serialize_batch(batch)
-      payload = []
+      batch_data = []
       batch.map! do |event|
         begin
           data = clean_data(event.data)
@@ -271,7 +271,7 @@ module Libhoney
             data: data
           }
 
-          payload << JSON.generate(e)
+          batch_data << e
 
           event
         rescue StandardError => e
@@ -284,9 +284,9 @@ module Libhoney
         end
       end
 
-      return if payload.empty?
+      return if batch_data.empty?
 
-      "[#{payload.join(',')}]"
+      JSON.generate(batch_data)
     end
 
     def build_user_agent(user_agent_addition)
